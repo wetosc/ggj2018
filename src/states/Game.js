@@ -2,6 +2,7 @@
 import Phaser from 'phaser'
 import Map from '../code/Map'
 import Ship from '../sprites/Ship'
+import {UI, UIData} from '../code/UI'
 
 export default class extends Phaser.State {
     init() { }
@@ -19,20 +20,20 @@ export default class extends Phaser.State {
 
         this.createPlayer()
 
-        this.placeRocks()
-
         this.createKeys()
 
         this.game.camera.follow(this.ship)
 
-        this.createText()
+        this.createUI()
+
+        this.game.startTime = this.game.time.now
     }
 
     createVars() {
-        this.wraps = 1
+        this.wraps = 0
         this.wrapping = true
-        this.stopped = false
         this.speed = 300
+        this._beforeWrap = true
     }
 
     createPlayer() {
@@ -41,27 +42,28 @@ export default class extends Phaser.State {
             map: this.map,
             asset: "ship"
         })
-        this.ship.setPosY(3)
+        this.ship.setPosY(2)
         this.game.add.existing(this.ship)
     }
-
+ 
     createKeys() {
         let upKey = game.input.keyboard.addKey(Phaser.Keyboard.UP)
-        upKey.onDown.add(this.ship.moveUp, this.ship)
+        upKey.onDown.add(this.onUpKey, this)
         let downKey = game.input.keyboard.addKey(Phaser.Keyboard.DOWN)
-        downKey.onDown.add(this.ship.moveDown, this.ship)
+        downKey.onDown.add(this.onDownKey, this)
     }
 
-    createText() {
-        var style1 = { font: "20px Arial", fill: "#ff0" };
-        var t1 = this.game.add.text(10, 20, "Life:", style1);
-        var t2 = this.game.add.text(this.game.width - 300, 20, "Remaining Flea Scratches:", style1);
-        t1.fixedToCamera = true;
-        t2.fixedToCamera = true;
+    createUI() {
+        let ui = new UI({ game: this.game })
+        ui.delegate = this
+        ui.onPause = this.onPause
+        this.ui = ui
+        this.stats = new UIData({ui: this.ui})
+        this.stats.life = 3
     }
 
-    placeRocks() {
-        let difficulty = Math.min(Math.round(this.wraps / 2), 8)
+    generateMap() {
+        let difficulty = Math.min(Math.round(this.wraps / 2) + 1, 8)
         this.map.generate(difficulty)
         let newSpeed = this.map.infoForLevel(difficulty).speed
         if (newSpeed) {
@@ -79,26 +81,41 @@ export default class extends Phaser.State {
             rock.height = this.map.tileHeight
             rock.body.velocity.x = 0
         }
+
+        // if (this.wraps % 3 == 0) {
+            let newShip = new Ship({
+                game: this.game, 
+                map: this.map,
+                position: this.map.generateShip(),
+                asset: 'ship'
+            })
+            this.game.add.existing(newShip)
+            if (this.secondShip) {
+                this.secondShip.destroy()
+            }
+            this.secondShip = newShip;
+        // }
     }
 
     render() {
         if (__DEV__) {
-            // this.game.debug.bodyInfo(this.ship, 32, 32)
+            // this.game.debug.cameraInfo(this.game.camera, 32, 32);
         }
-
     }
 
     update() {
 
-        if (this.ship.alive && !this.stopped) {
-
-            this.game.physics.arcade.overlap(this.ship, this.rocks, this.onHitRocks, null, this);
-            this.ship.body.velocity.x = this.speed;
+        if (this.ship.alive) {
 
             this.updateWrap()
 
-            this.game.world.wrap(this.ship, -(this.game.width / 2), false, true, false)
+            this.game.physics.arcade.overlap(this.ship, this.rocks, this.onHitRocks, null, this);
+            this.game.physics.arcade.overlap(this.ship, this.secondShip, this.onHitShip, null, this);
+            
+            this.ship.body.velocity.x = this.speed;
 
+            this.game.world.wrap(this.ship, -(this.game.width / 2), false, true, false)
+            
         } else {
 
             this.ship.body.velocity.x = 0
@@ -106,15 +123,33 @@ export default class extends Phaser.State {
     }
 
     updateWrap() {
+        let dist = this.game.world.width - this.ship.x
+        if (this.wraps > 0 && dist <= this.game.width) {
+            let lerpX = this.game.camera.lerp.x
+            if (lerpX < 1) {
+                this.game.camera.lerp.x += 0.01
+            } else {
+                this.game.camera.lerp.x = 1
+            }
+
+            if (!this._beforeWrap && dist <= this.game.width*0.55 ) {
+                this._beforeWrap = true
+                this.beforeWrap()
+            }
+        }
 
         if (!this.wrapping && this.ship.x < this.game.width) {
-
-            this.wraps++
-
+            
+            if (this.wraps == 0) {
+                this.startLevel()
+            } else {
+                this.afterWrap()
+            }
+            
             this.wrapping = true
 
-            this.rocks.destroy()
-            this.placeRocks()
+            this.wraps++
+            this._beforeWrap = false
 
         } else if (this.ship.x >= this.game.width) {
 
@@ -122,11 +157,54 @@ export default class extends Phaser.State {
         }
     }
 
+    startLevel() {
+        this.generateMap()
+    }
+
+    afterWrap() {
+    }
+
+    beforeWrap() {
+        this.secondShip.destroy()
+        this.rocks.destroy()
+        this.generateMap()
+    }
+
+
     onHitRocks(ship, rock) {
-        rock.body = null
-        this.ship.health -= 1
-        if (this.ship.health <= 0) {
-            this.ship.alive = false
+        if (rock.hasCollided) {
+            return
         }
+        rock.body = null
+        rock.hasCollided = true
+        this.stats.life -= 1
+        if (this.stats.life <= 0) {
+            this.ship.alive = false
+            this.game.state.start("Over")
+        }
+    }
+
+    onHitShip(myShip, newShip) {
+        this.stats.life = 4
+        myShip.alive = false
+        myShip.body = null
+        
+        this.secondShip = myShip
+        this.ship = newShip
+        
+        this.game.camera.follow(newShip, this.game.camera.FOLLOW_LOCKON, 0.1, 1)
+        
+        newShip.body.velocity.x = this.speed
+    }
+
+    onUpKey() {
+        this.ship.moveUp()
+    }
+    onDownKey() {
+        this.ship.moveDown()
+    }
+
+    onPause() {
+        this.ship.alive = !this.ship.alive
     }
 }

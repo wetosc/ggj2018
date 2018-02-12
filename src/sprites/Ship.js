@@ -1,8 +1,10 @@
 import Phaser from 'phaser'
 
 export default class extends Phaser.Sprite {
-    constructor({ game, map, asset }) {
-        let coords = map.ship(3)
+    constructor({ game, map, asset, position }) {
+        
+        let coords = position || map.ship(2)
+        
         super(game, coords.x, coords.y, asset)
 
         this.map = map
@@ -13,13 +15,14 @@ export default class extends Phaser.Sprite {
 
         this.game.physics.arcade.enable(this)
         this.body.allowGravity = false;
-
+        
+        this.setPosY(coords.posY == null ? 2 : coords.posY)
+        
         this.createVars()
     }
 
     createVars() {
         this.health = 3
-        this.posY = 3
         this.angMult = -0.2
     }
 
@@ -52,6 +55,7 @@ export default class extends Phaser.Sprite {
     }
 
     moveUp() {
+        if (!this.alive) {  return  }
         if (this.posY > 0) {
             this.posY -= 1
         }
@@ -59,6 +63,7 @@ export default class extends Phaser.Sprite {
     }
 
     moveDown() {
+        if (!this.alive) {  return  }
         if (this.posY < 4) {
             this.posY += 1
         }

@@ -18,14 +18,14 @@ export default class Map {
 
     generateRocks(n) {
         let info = this.infoForLevel(this.level)
-        this.rocks = Array()
+        this.rocks = new Array()
         var x = 1
-        
+
         while (x < this.tileNr) {
             for (let i = 0; i < info.rocks; i++) {
                 let rock = {
                     x: x,
-                    y: this.rnd.integerInRange(0,4)
+                    y: this.rnd.integerInRange(0, 4)
                 }
                 this.rocks.push(rock)
             }
@@ -36,6 +36,23 @@ export default class Map {
 
         this.rockNumber = this.rocks.length
     }
+
+    generateShip() {
+        var newX = this.rocks[Math.floor(Math.random() * this.rocks.length)].x
+        let rocks = this.rocks.filter(x => x.x == newX).map(x => x.y)
+        var arr = new Array()
+        let allNr = [0, 1, 2, 3, 4]
+        allNr.forEach(function (x) {
+            if (!rocks.includes(x)) { arr.push(x) }
+        })
+        let newY = arr[Math.floor(Math.random() * arr.length)]
+        return {
+            x: this.startX + newX * this.tileWidth,
+            y: this.startY + (newY + 0.5) * this.tileHeight,
+            posY: Math.round(newY)
+        }
+    }
+
     rock(index) {
         let rock = this.rocks[index]
         return {
@@ -49,7 +66,8 @@ export default class Map {
     ship(posY) {
         return {
             x: 200,
-            y: this.startY + this.tileHeight * (posY + 0.5)
+            y: this.startY + this.tileHeight * (posY + 0.5),
+            posY: posY
         }
     }
 
