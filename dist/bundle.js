@@ -10589,7 +10589,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__states_Splash__ = __webpack_require__(/*! ./states/Splash */ 338);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__states_Game__ = __webpack_require__(/*! ./states/Game */ 340);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__states_Over__ = __webpack_require__(/*! ./states/Over */ 344);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__config__ = __webpack_require__(/*! ./config */ 345);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__states_Menu__ = __webpack_require__(/*! ./states/Menu */ 347);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__config__ = __webpack_require__(/*! ./config */ 345);
+
 
 
 
@@ -10604,13 +10606,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 class Game extends __WEBPACK_IMPORTED_MODULE_2_phaser___default.a.Game {
   constructor() {
     const docElement = document.documentElement;
-    const width = docElement.clientWidth > __WEBPACK_IMPORTED_MODULE_7__config__["a" /* default */].gameWidth ? __WEBPACK_IMPORTED_MODULE_7__config__["a" /* default */].gameWidth : docElement.clientWidth;
-    const height = docElement.clientHeight > __WEBPACK_IMPORTED_MODULE_7__config__["a" /* default */].gameHeight ? __WEBPACK_IMPORTED_MODULE_7__config__["a" /* default */].gameHeight : docElement.clientHeight;
+    const width = docElement.clientWidth > __WEBPACK_IMPORTED_MODULE_8__config__["a" /* default */].gameWidth ? __WEBPACK_IMPORTED_MODULE_8__config__["a" /* default */].gameWidth : docElement.clientWidth;
+    const height = docElement.clientHeight > __WEBPACK_IMPORTED_MODULE_8__config__["a" /* default */].gameHeight ? __WEBPACK_IMPORTED_MODULE_8__config__["a" /* default */].gameHeight : docElement.clientHeight;
 
     super(width, height, __WEBPACK_IMPORTED_MODULE_2_phaser___default.a.CANVAS, 'content', null);
 
     this.state.add('Boot', __WEBPACK_IMPORTED_MODULE_3__states_Boot__["a" /* default */], false);
     this.state.add('Splash', __WEBPACK_IMPORTED_MODULE_4__states_Splash__["a" /* default */], false);
+    this.state.add('Menu', __WEBPACK_IMPORTED_MODULE_7__states_Menu__["a" /* default */], false);
     this.state.add('Game', __WEBPACK_IMPORTED_MODULE_5__states_Game__["a" /* default */], false);
     this.state.add('Over', __WEBPACK_IMPORTED_MODULE_6__states_Over__["a" /* default */], false);
 
@@ -10734,7 +10737,7 @@ if (window.cordova) {
   }
 
   create() {
-    this.state.start('Game');
+    this.state.start('Menu');
   }
 });
 
@@ -11325,6 +11328,48 @@ class UIData {
   gameWidth: 1000,
   gameHeight: 600,
   localStorageName: 'phaseres6webpack'
+});
+
+/***/ }),
+/* 346 */,
+/* 347 */
+/*!****************************!*\
+  !*** ./src/states/Menu.js ***!
+  \****************************/
+/*! exports provided: default */
+/*! exports used: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_phaser__ = __webpack_require__(/*! phaser */ 29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_phaser___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_phaser__);
+
+
+/* harmony default export */ __webpack_exports__["a"] = (class extends __WEBPACK_IMPORTED_MODULE_0_phaser___default.a.State {
+
+    create() {
+        this.createText();
+        this.createButtons();
+    }
+
+    createText() {
+        // var style = { font: "26px Arial", fill: "#0000ff" }
+
+        // var t1 = this.game.add.text(this.game.width / 2, this.game.height / 2 - 50, "Your score:", style)
+        // t1.anchor.setTo(0.5)
+
+        // var t2 = this.game.add.text(this.game.width / 2, this.game.height / 2, this.score + " seconds", style)
+        // t2.anchor.setTo(0.5)
+    }
+
+    createButtons() {
+        let button = game.add.button(game.width / 2, game.height / 2, 'button', this.onClick, this);
+        button.anchor.setTo(0.5);
+    }
+
+    onClick() {
+        this.game.state.start("Game");
+    }
 });
 
 /***/ })
