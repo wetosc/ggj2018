@@ -76,9 +76,12 @@ export default class extends Phaser.State {
         var rock
         for (let i = 0; i < this.map.rockNumber; i++) {
             var coords = this.map.rock(i)
-            rock = this.rocks.create(coords.x, coords.y, "block")
-            rock.width = this.map.tileWidth
-            rock.height = this.map.tileHeight
+            let rock_sprites = ["rock1", "rock2"]
+            let sprite = rock_sprites[Math.floor(Math.random()*rock_sprites.length)];
+            rock = this.rocks.create(coords.x, coords.y, sprite)
+            let ratio = rock.width / rock.height
+            rock.height = this.map.tileHeight*0.8
+            rock.width = rock.height * ratio
             rock.body.velocity.x = 0
         }
 
