@@ -10856,9 +10856,19 @@ const centerGameObjects = objects => {
             let rock_sprites = ["rock1", "rock2"];
             let sprite = rock_sprites[Math.floor(Math.random() * rock_sprites.length)];
             rock = this.rocks.create(coords.x, coords.y, sprite);
-            let ratio = rock.width / rock.height;
-            rock.height = this.map.tileHeight * 0.8;
-            rock.width = rock.height * ratio;
+
+            if (rock.height >= rock.width) {
+                let ratio = rock.width / rock.height;
+                rock.height = this.map.tileHeight * 0.8;
+                rock.width = rock.height * ratio;
+            } else {
+                let ratio = rock.height / rock.width;
+                rock.width = this.map.tileHeight * 0.8;
+                rock.height = rock.width * ratio;
+            }
+            rock.anchor.setTo(0.5, 0.5);
+            rock.angle = this.game.rnd.angle();
+            rock.y += this.map.tileHeight * 0.5;
             rock.body.velocity.x = 0;
         }
 
@@ -11021,17 +11031,21 @@ class Map {
         var x = 1;
 
         while (x < this.tileNr) {
+            let usedY = new Array();
             for (let i = 0; i < info.rocks; i++) {
+                var newY = this.rnd.integerInRange(0, 4);
+                while (usedY.includes(newY)) {
+                    newY = this.rnd.integerInRange(0, 4);
+                }
+                usedY.push(newY);
                 let rock = {
                     x: x,
-                    y: this.rnd.integerInRange(0, 4)
+                    y: newY
                 };
                 this.rocks.push(rock);
             }
             x += info.dist + 1;
         }
-
-        this.rocks = [...new Set(this.rocks)];
 
         this.rockNumber = this.rocks.length;
     }

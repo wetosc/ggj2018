@@ -22,17 +22,19 @@ export default class Map {
         var x = 1
 
         while (x < this.tileNr) {
+            let usedY = new Array()
             for (let i = 0; i < info.rocks; i++) {
+                var newY = this.rnd.integerInRange(0, 4)
+                while (usedY.includes(newY)) { newY = this.rnd.integerInRange(0, 4) }
+                usedY.push(newY)
                 let rock = {
                     x: x,
-                    y: this.rnd.integerInRange(0, 4)
+                    y: newY
                 }
                 this.rocks.push(rock)
             }
             x += info.dist + 1
         }
-
-        this.rocks = [...new Set(this.rocks)]
 
         this.rockNumber = this.rocks.length
     }
