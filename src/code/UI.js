@@ -11,24 +11,27 @@ export class UI {
 
     createVars() {
         this.onPause = null
+        this.isPaused = false
     }
 
     createText() {
-        var style1 = { font: "20px Arial", fill: "#f00" }
-        var t1 = this.game.add.text(10, 20, "Lifes:", style1)
+        var style1 = { font: "34px dimboregular", fill: "#f00" }
+        var t1 = this.game.add.text(10, 12, "Lifes:", style1)
         t1.fixedToCamera = true
 
-        var style2 = { font: "26px Arial", fill: "#0000ff" }
-        this.lifesText = this.game.add.text(80, 18, "", style2)
-        this.lifesText.fixedToCamera = true
+        var style2 = { font: "36px dimboregular", fill: "#0000ff" }
+        var t2 = this.game.add.text(100, 10, "", style2)
+        t2.fixedToCamera = true
+        this.lifesText = t2
     }
 
     createButtons() {
-        let button = game.add.button(game.width - 50, 10, 'button', this.pause, this);
+        let button = game.add.button(game.width - 50, 10, 'ui_pause1', this.pause, this);
         button.width = 40
         button.height = 40
         button.anchor.setTo(0)
         button.fixedToCamera = true
+        this.pauseButton = button
     }
 
     update(data) {
@@ -36,6 +39,10 @@ export class UI {
     }
 
     pause() {
+        let pauseButtonImg = this.isPaused ? "ui_pause1" : "ui_pause2"
+        this.pauseButton.loadTexture(pauseButtonImg)
+        this.isPaused = !this.isPaused
+        
         this.onPause.call(this.delegate)
     }
 }

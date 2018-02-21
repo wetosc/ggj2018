@@ -10735,6 +10735,15 @@ if (window.cordova) {
     this.load.image('rock2', 'assets/images/rock2.png');
     this.load.image('ship', 'assets/images/ship1.png');
     this.load.image('button', 'assets/images/button.png');
+    this.load.image('water_tile', 'assets/images/water_tile.png');
+    this.load.image('land_b_tile', 'assets/images/land_b_tile.png');
+    this.load.image('land_t_tile', 'assets/images/land_t_tile.png');
+
+    this.load.image('ui_bg', 'assets/images/bg_big.png');
+    this.load.image('ui_pause1', 'assets/images/pause_1.png');
+    this.load.image('ui_pause2', 'assets/images/pause_2.png');
+    this.load.image('ui_play', 'assets/images/play_button.png');
+    this.load.image('ui_replay', 'assets/images/replay_button.png');
   }
 
   create() {
@@ -10795,6 +10804,8 @@ const centerGameObjects = objects => {
             endX: this.game.world.width - this.game.width
         });
 
+        this.createBG();
+
         this.createPlayer();
 
         this.createKeys();
@@ -10837,6 +10848,16 @@ const centerGameObjects = objects => {
         this.ui = ui;
         this.stats = new __WEBPACK_IMPORTED_MODULE_3__code_UI__["b" /* UIData */]({ ui: this.ui });
         this.stats.life = 3;
+    }
+
+    createBG() {
+        this.bg_water = this.add.tileSprite(0, this.map.startY, this.game.world.width, this.map.endY - this.map.startY, 'water_tile');
+        this.bg_water.autoScroll(-this.speed / 4, 0);
+
+        this.bg_bottom = this.add.tileSprite(0, this.map.endY, this.game.world.width, this.game.world.height - this.map.endY, "land_b_tile");
+        // this.bg_bottom.autoScroll(-this.speed/8, 0);
+        this.bg_top = this.add.tileSprite(0, 0, this.game.world.width, this.map.startY, "land_t_tile");
+        // this.bg_top.autoScroll(-this.speed/8, 0);
     }
 
     generateMap() {
@@ -10949,12 +10970,13 @@ const centerGameObjects = objects => {
         this.generateMap();
     }
 
-    afterWrap() {}
+    afterWrap() {
+        this.generateMap();
+    }
 
     beforeWrap() {
         this.secondShip.destroy();
         this.rocks.destroy();
-        this.generateMap();
     }
 
     onHitRocks(ship, rock) {
@@ -11017,6 +11039,7 @@ class Map {
         this.tileWidth = 90;
         this.tileHeight = 90;
         this.startY = 100;
+        this.endY = this.startY + 5 * this.tileHeight;
     }
 
     generate(difficulty) {
@@ -11236,24 +11259,27 @@ class UI {
 
     createVars() {
         this.onPause = null;
+        this.isPaused = false;
     }
 
     createText() {
-        var style1 = { font: "20px Arial", fill: "#f00" };
-        var t1 = this.game.add.text(10, 20, "Lifes:", style1);
+        var style1 = { font: "34px dimboregular", fill: "#f00" };
+        var t1 = this.game.add.text(10, 12, "Lifes:", style1);
         t1.fixedToCamera = true;
 
-        var style2 = { font: "26px Arial", fill: "#0000ff" };
-        this.lifesText = this.game.add.text(80, 18, "", style2);
-        this.lifesText.fixedToCamera = true;
+        var style2 = { font: "36px dimboregular", fill: "#0000ff" };
+        var t2 = this.game.add.text(100, 10, "", style2);
+        t2.fixedToCamera = true;
+        this.lifesText = t2;
     }
 
     createButtons() {
-        let button = game.add.button(game.width - 50, 10, 'button', this.pause, this);
+        let button = game.add.button(game.width - 50, 10, 'ui_pause1', this.pause, this);
         button.width = 40;
         button.height = 40;
         button.anchor.setTo(0);
         button.fixedToCamera = true;
+        this.pauseButton = button;
     }
 
     update(data) {
@@ -11261,6 +11287,10 @@ class UI {
     }
 
     pause() {
+        let pauseButtonImg = this.isPaused ? "ui_pause1" : "ui_pause2";
+        this.pauseButton.loadTexture(pauseButtonImg);
+        this.isPaused = !this.isPaused;
+
         this.onPause.call(this.delegate);
     }
 }
@@ -11302,24 +11332,36 @@ class UIData {
 /* harmony default export */ __webpack_exports__["a"] = (class extends __WEBPACK_IMPORTED_MODULE_0_phaser___default.a.State {
 
     create() {
+        this.createBG();
         this.score = (this.game.time.now - this.game.startTime) * 0.001;
         this.score = this.score.toFixed(2);
         this.createText();
         this.createButtons();
     }
 
+    createBG() {
+        let bg = game.add.image(0, 0, 'ui_bg');
+        let ratio = this.game.width / this.game.height;
+        bg.height = this.game.height;
+        bg.width = this.game.width * ratio;
+    }
+
     createText() {
-        var style = { font: "26px Arial", fill: "#0000ff" };
+        let y = 220;
+        var style = { font: "bold 36px dimboregular", fill: "#0000ff" };
 
-        var t1 = this.game.add.text(this.game.width / 2, this.game.height / 2 - 50, "Your score:", style);
+        var t1 = this.game.add.text(this.game.width / 2, y, "Your score:", style);
         t1.anchor.setTo(0.5);
+        y += 50;
 
-        var t2 = this.game.add.text(this.game.width / 2, this.game.height / 2, this.score + " seconds", style);
+        var t2 = this.game.add.text(this.game.width / 2, y, this.score + " seconds", style);
         t2.anchor.setTo(0.5);
     }
 
     createButtons() {
-        let button = game.add.button(game.width / 2, 100, 'button', this.onClick, this);
+        let button = game.add.button(game.width / 2, this.game.height / 2 + 100, 'ui_replay', this.onClick, this);
+        button.width = 200;
+        button.height = 50;
         button.anchor.setTo(0.5);
     }
 
@@ -11349,8 +11391,16 @@ class UIData {
 /* harmony default export */ __webpack_exports__["a"] = (class extends __WEBPACK_IMPORTED_MODULE_0_phaser___default.a.State {
 
     create() {
+        this.createBG();
         this.createText();
         this.createButtons();
+    }
+
+    createBG() {
+        let bg = game.add.image(0, 0, 'ui_bg');
+        let ratio = this.game.width / this.game.height;
+        bg.height = this.game.height;
+        bg.width = this.game.width * ratio;
     }
 
     createText() {
@@ -11364,7 +11414,9 @@ class UIData {
     }
 
     createButtons() {
-        let button = game.add.button(game.width / 2, game.height / 2, 'button', this.onClick, this);
+        let button = game.add.button(game.width / 2, game.height / 2, 'ui_play', this.onClick, this);
+        button.width = 200;
+        button.height = 50;
         button.anchor.setTo(0.5);
     }
 

@@ -18,6 +18,8 @@ export default class extends Phaser.State {
             endX: this.game.world.width - this.game.width
         })
 
+        this.createBG()        
+
         this.createPlayer()
 
         this.createKeys()
@@ -61,6 +63,17 @@ export default class extends Phaser.State {
         this.stats = new UIData({ui: this.ui})
         this.stats.life = 3
     }
+
+    createBG() {
+        this.bg_water = this.add.tileSprite(0, this.map.startY, this.game.world.width, this.map.endY-this.map.startY, 'water_tile');
+        this.bg_water.autoScroll(-this.speed/4, 0);
+        
+        this.bg_bottom = this.add.tileSprite(0, this.map.endY, this.game.world.width, this.game.world.height - this.map.endY, "land_b_tile")
+        // this.bg_bottom.autoScroll(-this.speed/8, 0);
+        this.bg_top = this.add.tileSprite(0, 0, this.game.world.width, this.map.startY, "land_t_tile")
+        // this.bg_top.autoScroll(-this.speed/8, 0);
+    }
+    
 
     generateMap() {
         let difficulty = Math.min(Math.round(this.wraps / 2) + 1, 8)
@@ -175,12 +188,12 @@ export default class extends Phaser.State {
     }
 
     afterWrap() {
+        this.generateMap()
     }
 
     beforeWrap() {
         this.secondShip.destroy()
         this.rocks.destroy()
-        this.generateMap()
     }
 
 

@@ -8,6 +8,7 @@ export default class Map {
         this.tileWidth = 90
         this.tileHeight = 90
         this.startY = 100
+        this.endY = this.startY + 5 * this.tileHeight
     }
 
     generate(difficulty) {

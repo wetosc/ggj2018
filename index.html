@@ -15,10 +15,20 @@
             margin: 0;
             padding: 0;
         }
+
+        @font-face {
+            font-family: 'dimboregular';
+            src: url('assets/fonts/dimbo/dimbo-regular-webfont.woff2') format('woff2'),
+            url('assets/fonts/dimbo/dimbo-regular-webfont.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+
+        }
     </style>
 </head>
 
 <body>
+    <div style="font-family:dimboregular; position:absolute; left:-10000px">Font Loaded</div>
 
     <div id="content"></div>
     <!-- uncomment the line bellow for cordova feature -->
