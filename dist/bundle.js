@@ -10811,6 +10811,7 @@ const centerGameObjects = objects => {
         this.createKeys();
 
         this.game.camera.follow(this.ship);
+        game.camera.onShakeComplete.add(this.afterShake, this);
 
         this.createUI();
 
@@ -10920,7 +10921,7 @@ const centerGameObjects = objects => {
 
             this.updateWrap();
 
-            this.game.physics.arcade.overlap(this.ship, this.rocks, this.onHitRocks, null, this);
+            this.game.physics.arcade.collide(this.ship, this.rocks, this.onHitRocks, null, this);
             this.game.physics.arcade.overlap(this.ship, this.secondShip, this.onHitShip, null, this);
 
             this.ship.body.velocity.x = this.speed;
@@ -10985,10 +10986,17 @@ const centerGameObjects = objects => {
         }
         rock.body = null;
         rock.hasCollided = true;
+        this.game.add.tween(rock.scale).to({ x: 0.05, y: 0.05 }, 0.5, __WEBPACK_IMPORTED_MODULE_0_phaser___default.a.Easing.Out, true);
+        this.game.world.bringToTop(this.ship);
+        game.camera.shake(0.05, 300);
+    }
+
+    afterShake() {
         this.stats.life -= 1;
         if (this.stats.life <= 0) {
             this.ship.alive = false;
             this.game.state.start("Over");
+            return;
         }
     }
 
