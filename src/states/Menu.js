@@ -6,6 +6,8 @@ export default class extends Phaser.State {
         this.createBG()
         this.createText()
         this.createButtons()
+        this.music = this.game.add.audio("bg_music")
+        this.music.play()
     }
 
     createBG() {

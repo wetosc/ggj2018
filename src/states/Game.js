@@ -18,6 +18,14 @@ export default class extends Phaser.State {
             endX: this.game.world.width - this.game.width
         })
 
+        this.audio_slosh = this.game.add.audio('slosh')
+        this.audio_crash = this.game.add.audio('crash')
+        
+        this.game.sound.stopAll()
+        
+        this.music = this.game.add.audio("bg_music", 0.9, true)
+        this.music.play()
+
         this.createBG()        
 
         this.createPlayer()
@@ -202,6 +210,7 @@ export default class extends Phaser.State {
         if (rock.hasCollided) {
             return
         }
+        this.audio_crash.play()
         rock.body = null
         rock.hasCollided = true
         this.game.add.tween(rock.scale).to({x: 0.05, y: 0.05 }, 0.5, Phaser.Easing.Out, true);
@@ -232,13 +241,21 @@ export default class extends Phaser.State {
     }
 
     onUpKey() {
+        this.audio_slosh.play()
         this.ship.moveUp()
     }
     onDownKey() {
+        this.audio_slosh.play()
         this.ship.moveDown()
     }
 
     onPause() {
+        if (this.ship.alive) {
+            this.music.pause()
+        } else {
+            this.music.resume()
+        }
+
         this.ship.alive = !this.ship.alive
     }
 }

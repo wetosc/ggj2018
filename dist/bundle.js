@@ -10744,6 +10744,10 @@ if (window.cordova) {
     this.load.image('ui_pause2', 'assets/images/pause_2.png');
     this.load.image('ui_play', 'assets/images/play_button.png');
     this.load.image('ui_replay', 'assets/images/replay_button.png');
+
+    this.load.audio('slosh', ['assets/audio/water_slosh.mp3', 'assets/audio/water_slosh.ogg']);
+    this.load.audio('crash', ['assets/audio/wood_split.mp3', 'assets/audio/wood_split.ogg']);
+    this.load.audio('bg_music', ['assets/audio/master_of_the_feast.mp3', 'assets/audio/master_of_the_feast.ogg']);
   }
 
   create() {
@@ -10803,6 +10807,14 @@ const centerGameObjects = objects => {
             startX: this.game.width,
             endX: this.game.world.width - this.game.width
         });
+
+        this.audio_slosh = this.game.add.audio('slosh');
+        this.audio_crash = this.game.add.audio('crash');
+
+        this.game.sound.stopAll();
+
+        this.music = this.game.add.audio("bg_music", 0.9, true);
+        this.music.play();
 
         this.createBG();
 
@@ -10984,6 +10996,7 @@ const centerGameObjects = objects => {
         if (rock.hasCollided) {
             return;
         }
+        this.audio_crash.play();
         rock.body = null;
         rock.hasCollided = true;
         this.game.add.tween(rock.scale).to({ x: 0.05, y: 0.05 }, 0.5, __WEBPACK_IMPORTED_MODULE_0_phaser___default.a.Easing.Out, true);
@@ -11014,13 +11027,21 @@ const centerGameObjects = objects => {
     }
 
     onUpKey() {
+        this.audio_slosh.play();
         this.ship.moveUp();
     }
     onDownKey() {
+        this.audio_slosh.play();
         this.ship.moveDown();
     }
 
     onPause() {
+        if (this.ship.alive) {
+            this.music.pause();
+        } else {
+            this.music.resume();
+        }
+
         this.ship.alive = !this.ship.alive;
     }
 });
@@ -11402,6 +11423,8 @@ class UIData {
         this.createBG();
         this.createText();
         this.createButtons();
+        this.music = this.game.add.audio("bg_music");
+        this.music.play();
     }
 
     createBG() {
