@@ -18,6 +18,9 @@ export default class extends Phaser.State {
             endX: this.game.world.width - this.game.width
         })
 
+        this.game.onPause.add(this.onPause, this)
+        this.game.onResume.add(this.onPause, this)
+
         this.audio_slosh = this.game.add.audio('slosh')
         this.audio_crash = this.game.add.audio('crash')
         

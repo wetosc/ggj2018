@@ -24,8 +24,10 @@ export default class extends Phaser.State {
     this.load.image('ui_bg',      'assets/images/bg_big.png')
     this.load.image('ui_pause1',  'assets/images/pause_1.png')
     this.load.image('ui_pause2',  'assets/images/pause_2.png')
+    this.load.image('ui_cancel',  'assets/images/cancel.png')
     this.load.image('ui_play',    'assets/images/play_button.png')
     this.load.image('ui_replay',  'assets/images/replay_button.png')
+    this.load.image('ui_credits',  'assets/images/credits_button.png')
 
     this.load.audio('slosh', ['assets/audio/water_slosh.mp3','assets/audio/water_slosh.ogg'] )
     this.load.audio('crash', ['assets/audio/wood_split.mp3', 'assets/audio/wood_split.ogg'] )

@@ -7,6 +7,7 @@ import SplashState from './states/Splash'
 import GameState from './states/Game'
 import OverState from './states/Over'
 import MenuState from './states/Menu'
+import CreditsState from './states/Credits'
 
 import config from './config'
 
@@ -21,6 +22,7 @@ class Game extends Phaser.Game {
     this.state.add('Boot', BootState, false)
     this.state.add('Splash', SplashState, false)
     this.state.add('Menu', MenuState, false)
+    this.state.add('Credits', CreditsState, false)
     this.state.add('Game', GameState, false)
     this.state.add('Over', OverState, false)
 

@@ -4,8 +4,8 @@ export default class extends Phaser.State {
 
     create() {
         this.createBG()
-        this.createText()
         this.createButtons()
+        this.game.sound.stopAll()
         this.music = this.game.add.audio("bg_music")
         this.music.play()
     }
@@ -17,25 +17,21 @@ export default class extends Phaser.State {
         bg.width = this.game.width * ratio
     }
 
-
-    createText() {
-        // var style = { font: "26px Arial", fill: "#0000ff" }
-
-        // var t1 = this.game.add.text(this.game.width / 2, this.game.height / 2 - 50, "Your score:", style)
-        // t1.anchor.setTo(0.5)
-
-        // var t2 = this.game.add.text(this.game.width / 2, this.game.height / 2, this.score + " seconds", style)
-        // t2.anchor.setTo(0.5)
-    }
-
     createButtons() {
-        let button = game.add.button(game.width/2, game.height/2, 'ui_play', this.onClick, this);
-        button.width = 200
-        button.height = 50
-        button.anchor.setTo(0.5)
+        let button1 = game.add.button(game.width/2, game.height/2 - 50, 'ui_play', this.onClick, this);
+        button1.width = 200
+        button1.height = 50
+        button1.anchor.setTo(0.5, 0)
+        let button2 = game.add.button(game.width/2, game.height/2 + 50, 'ui_credits', this.credits, this)
+        button2.width = 200
+        button2.height = 50
+        button2.anchor.setTo(0.5, 0)
     }
 
     onClick() {
         this.game.state.start("Game")   
+    }
+    credits() {
+        this.game.state.start("Credits")
     }
 }
